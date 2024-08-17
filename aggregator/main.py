@@ -47,7 +47,7 @@ def init_middleware(app: FastAPI) -> None:
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Weather",
+        title="News Aggregator",
         description="API service to fetch hailstorm data for given time frame and location",
         version="0.0.1",
         docs_url="/aggregator/swagger-ui",
