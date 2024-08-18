@@ -1,20 +1,5 @@
 // Initial Keywords
-const initialKeywords = ['climate change', 'environment'];
 import { getAggregatedNews } from './utils.mjs';
-
-// REMOVE THIS. 
-window.onload = function () {
-    const keywordList = document.getElementById('keyword-list');
-    initialKeywords.forEach(keyword => {
-        const keywordItem = document.createElement('div');
-        keywordItem.className = 'keyword-item';
-        keywordItem.innerHTML = `
-            <span>${keyword}</span>
-            <button class="remove-keyword-btn" onclick="removeKeyword(this)">x</button>
-        `;
-        keywordList.appendChild(keywordItem);
-    });
-}
 
 export function showKeywordInput() {
     document.getElementById('keyword-input-container').style.display = 'block';
@@ -98,6 +83,14 @@ export async function handleSubmit() {
     // Call custom function and handle the response
     const response = await customFunction(formData);
     renderCards(response);
+    // Adjust layout after cards are rendered
+    const formContainer = document.querySelector('.form-container');
+    const cardsContainer = document.getElementById('cards-container');
+
+    // Reveal cards container and shift form to the left
+    cardsContainer.classList.remove('hidden');
+    cardsContainer.classList.add('visible');
+    formContainer.style.maxWidth = '50%';
 }
 
 // Example custom function that returns a list of dictionaries
