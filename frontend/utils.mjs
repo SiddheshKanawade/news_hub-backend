@@ -11,12 +11,14 @@ async function getAggregatedNews(apiURL, keyWords) {
         });
 
         if (!response.ok) {
+            alert('No news found for the given criteria');
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         let data = await response.json();
 
         return data['results'];
     } catch (error) {
+        console.log(apiURL);
         console.error('Error while calling news aggregator:', error);
     }
 

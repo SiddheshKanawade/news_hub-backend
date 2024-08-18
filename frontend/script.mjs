@@ -2,7 +2,7 @@
 const initialKeywords = ['climate change', 'environment'];
 import { getAggregatedNews } from './utils.mjs';
 
-
+// REMOVE THIS. 
 window.onload = function () {
     const keywordList = document.getElementById('keyword-list');
     initialKeywords.forEach(keyword => {
@@ -46,23 +46,47 @@ export function removeKeyword(button) {
 }
 
 export async function handleSubmit() {
-    // Gather form data
-    const startDate = new Date(document.getElementById('start-date').value);
-    const endDate = new Date(document.getElementById('end-date').value);
-    const endPoint = document.getElementById('endpoint').value;
-    const language = document.getElementById('language').value;
-    const threshold = document.getElementById('threshold').value;
-    const page = document.getElementById('page').value;
-    const perPage = document.getElementById('per-page').value;
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+
+    if (!startDate || !endDate) {
+        alert("Please fill out the start date and end date");
+        return;
+    }
+    const startDateFormatted = new Date(startDate);
+    const endDateFormatted = new Date(endDate);
 
     // Gather keywords
     const keywordElements = document.querySelectorAll('.keyword-item span');
     const keyWords = Array.from(keywordElements).map(elem => elem.textContent);
 
+    if (keyWords.length === 0) {
+        alert('Please add at least one keyword');
+        return;
+    }
+    else if (startDateFormatted >= endDateFormatted) {
+        alert('End date should be greater than start date');
+        return;
+    }
+
+    let endPoint = document.getElementById('endpoint').value;
+    let language = document.getElementById('language').value;
+    let threshold = document.getElementById('threshold').value;
+    const page = 1;
+    const perPage = 10;
+    if (!endPoint) {
+        endPoint = 'everything';
+    }
+    if (!language) {
+        language = 'en';
+    }
+    if (!threshold) {
+        threshold = 10;
+    }
     // Create the form data object
     const formData = {
-        startDate,
-        endDate,
+        startDateFormatted,
+        endDateFormatted,
         keyWords,
         endPoint,
         language,
@@ -79,15 +103,14 @@ export async function handleSubmit() {
 // Example custom function that returns a list of dictionaries
 async function customFunction(formData) {
     // Don't expose the base URL in the frontend
-    const baseUrl = 'http://localhost:3000/news/';
-    const formattedStartDate = formData.startDate.toISOString().split('T')[0];
-    const formattedEndDate = formData.endDate.toISOString().split('T')[0];
+    const baseUrl = 'http://localhost:8080/news/';
+    const formattedStartDate = formData.startDateFormatted.toISOString().split('T')[0];
+    const formattedEndDate = formData.endDateFormatted.toISOString().split('T')[0];
     const apiURL = `${baseUrl}?startDate=${formattedStartDate}&endDate=${formattedEndDate}&endPoint=${formData.endPoint}&language=${formData.language}&threshold=${formData.threshold}&page=${formData.page}&perPage=${formData.perPage}`;
     // Example data returned (simulate your function's return)
     console.log('Calling API:', apiURL);
 
     const aggregatedNews = await getAggregatedNews(apiURL, formData.keyWords);
-    console.log(aggregatedNews);
     return aggregatedNews;
 }
 
@@ -101,8 +124,8 @@ async function renderCards(data) {
         card.innerHTML = `
             <h4>${item.title}</h4>
             <p>${item.description}</p>
+            <p>Published at: ${item.publishedAt}<p>
             <a href="${item.url}" target="_blank">Read More</a>
-            <p>published at: ${item.publishedAt}<p>
         `;
         cardsContainer.appendChild(card);
     });
