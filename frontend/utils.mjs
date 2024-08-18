@@ -18,7 +18,7 @@ async function getAggregatedNews(apiURL, keyWords) {
 
         return data['results'];
     } catch (error) {
-        console.log(apiURL);
+        alert('Error connecting to server');
         console.error('Error while calling news aggregator:', error);
     }
 
