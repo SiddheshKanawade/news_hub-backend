@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Hub</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="content-wrapper">
+        <div class="form-container">
+            <h2>News Aggregator</h2>
+            <!-- Keywords Field with Logic -->
+            <div class="form-section">
+                <h5>Keywords</h5>
+                <p>Add the relevant keywords. They'll appear in your keywords section.</p>
+                <button class="add-keyword-btn" onclick="showKeywordInput()">+ Add keyword</button>
+                <div id="keyword-input-container" style="display: none;">
+                    <input type="text" id="keyword-input" placeholder="Enter a keyword" onkeypress="addKeyword(event)">
+                </div>
+                <div class="keyword-list" id="keyword-list">
+                    <!-- Prepopulate with initial keywords -->
+                </div>
+            </div>
+
+            <div class="form-group">
+
+                <!-- End Date Field -->
+                <label for="end-date">End Date:</label>
+                <!-- <input type="date" id="end-date" value="2024-08-15"> -->
+                <input type="date" id="end-date">
+
+                <!-- Start Date Field -->
+                <label for="start-date">Start Date:</label>
+                <!-- <input type="date" id="start-date" value="2024-08-09"> -->
+                <input type="date" id="start-date">
+
+                <!-- Endpoint Field -->
+                <label for="endpoint">Endpoint:</label>
+                <select name="endpoint" id="endpoint">
+                    <option value="everything">Complete News</option>
+                    <option value="top-headlines">Top-headlines</option>
+                </select>
+
+                <!-- Language Field -->
+                <label for="language">Language:</label>
+                <select name="language" class="form-control" id="language">
+                    <option value="en">English</option>
+                    <option value="ar">Arabic</option>
+                    <option value="de">German</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="he">Hebrew</option>
+                    <option value="fr">French</option>
+                    <option value="he">Hebrew</option>
+                    <option value="it">Italian</option>
+                    <option value="nl">Dutch</option>
+                    <option value="no">Norwegian</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ru">Russian</option>
+                    <option value="sv">Swedish</option>
+                    <option value="zh">Chinese</option>
+                </select>
+
+                <!-- Threshold Field -->
+                <label for="threshold">Number of News to be reported:</label>
+                <input type="number" id="threshold" value="10">
+                <!-- Submit Button -->
+                <button class="submit-btn" onclick="handleSubmit()">Submit</button>
+            </div>
+        </div>
+
+        <!-- Cards Container (Initially hidden) -->
+        <div id="cards-container" class="hidden"></div>
+    </div>
+    <script type="module" src="./script.mjs"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

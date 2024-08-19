@@ -68,6 +68,9 @@ def get_news(
 
     response = requests.get(url, params=params)
 
+    if response.status_code != 200:
+        raise NotFoundException(f"Error fetching news: {response.json()}")
+
     if response.json()["totalResults"] == 0:
         raise NotFoundException("No news found")
     elif response.json()["totalResults"] < threshold:
