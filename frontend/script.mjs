@@ -82,6 +82,10 @@ export async function handleSubmit() {
 
     // Call custom function and handle the response
     const response = await customFunction(formData);
+    if (response.length === 0) {
+        alert('No news found with the given criteria');
+        return;
+    }
     renderCards(response);
     // Adjust layout after cards are rendered
     const formContainer = document.querySelector('.form-container');

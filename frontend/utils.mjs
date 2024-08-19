@@ -11,8 +11,8 @@ async function getAggregatedNews(apiURL, keyWords) {
         });
 
         if (!response.ok) {
-            alert('No news found for the given criteria');
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.log(`HTTP error! status: ${response.status}`);
+            return [];
         }
         let data = await response.json();
 
