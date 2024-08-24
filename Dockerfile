@@ -10,7 +10,7 @@ ENV FAST_ENV=${FAST_ENV} \
 RUN mkdir /app
 WORKDIR /app
 
-COPY requirements.txt ./aggregator/setup.py ./
+COPY ./aggregator/requirements.txt ./aggregator/setup.py ./
 
 RUN pip install -e .
 
