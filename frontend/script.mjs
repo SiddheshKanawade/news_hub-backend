@@ -1,4 +1,3 @@
-// Initial Keywords
 import { getAggregatedNews } from './utils.mjs';
 
 export function showKeywordInput() {
@@ -100,7 +99,7 @@ export async function handleSubmit() {
 // Example custom function that returns a list of dictionaries
 async function customFunction(formData) {
     // Don't expose the base URL in the frontend
-    const baseUrl = 'http://localhost:8080/news/';
+    const baseUrl = 'https://interested-cyndia-siddheshorg-cfa870e6.koyeb.app/news/';
     const formattedStartDate = formData.startDateFormatted.toISOString().split('T')[0];
     const formattedEndDate = formData.endDateFormatted.toISOString().split('T')[0];
     const apiURL = `${baseUrl}?startDate=${formattedStartDate}&endDate=${formattedEndDate}&endPoint=${formData.endPoint}&language=${formData.language}&threshold=${formData.threshold}&page=${formData.page}&perPage=${formData.perPage}`;
