@@ -15,4 +15,4 @@ COPY ./aggregator/requirements.txt ./aggregator/setup.py ./
 RUN pip install -e .
 
 COPY . .
-CMD ["uvicorn", "aggregator.main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "aggregator.main:app", "--host", "0.0.0.0", "--port", "8000"]
