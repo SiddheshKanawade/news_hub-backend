@@ -47,11 +47,12 @@ def get_news_sources(
 
 @router.post("/news/", response_model=Paginate[Article])
 def get_news(
-    startDate: datetime,
-    endDate: datetime,
-    keyWords: list[str],
+    startDate: datetime = None,
+    endDate: datetime = None,
+    keyWords: list[str] = None,
     endPoint: str = "everything",
     language: str = "en",
+    sources: list[str] = None,
     threshold: int = 10,
     page: int = 1,
     perPage: int = 10,
@@ -76,22 +77,33 @@ def get_news(
     Returns:
         Paginate[NoaaV1]: Returns list of paginated hailstorm details for given location and time frame
     """
-    start_date = startDate.strftime("%Y-%m-%d")
-    end_date = endDate.strftime("%Y-%m-%d")
-
-    query = " OR ".join(keyWords)
-    url = f"{URL}/{endPoint}"
     params = {
-        "q": query,
         "apiKey": NEWS_API_KEY,
-        "from": start_date,
-        "to": end_date,
         "language": language,
         "sortBy": "relevancy",
         "searcgIn": "title",
         "pageSize": 10,
         "page": 1,
     }
+
+    if not startDate:
+        params["sortBy"] = "publishedAt"
+
+    if startDate:
+        start_date = startDate.strftime("%Y-%m-%d")
+        params["from"] = start_date
+    if endDate:
+        end_date = endDate.strftime("%Y-%m-%d")
+        params["to"] = end_date
+
+    if keyWords:
+        query = " OR ".join(keyWords)
+        params["q"] = query
+
+    if sources:
+        params["sources"] = ",".join(sources)
+
+    url = f"{URL}/{endPoint}"
 
     response = requests.get(url, params=params)
 
