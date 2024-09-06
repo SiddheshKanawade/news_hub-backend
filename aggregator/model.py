@@ -17,3 +17,13 @@ class Article(BaseModel):
     urlToImage: Optional[HttpUrl]
     publishedAt: str
     content: Optional[str]
+
+
+class Source(BaseModel):
+    id: Optional[str]
+    name: str
+    url: Optional[HttpUrl]
+    description: Optional[str]
+    category: Optional[str]
+    language: Optional[str]
+    country: Optional[str]

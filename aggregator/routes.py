@@ -7,7 +7,7 @@ import requests
 from fastapi import APIRouter
 
 from aggregator.exceptions import NotFoundException
-from aggregator.model import Article
+from aggregator.model import Article, Source
 from aggregator.paginate import Paginate
 
 dotenv.load_dotenv()
@@ -16,6 +16,33 @@ NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 URL = "https://newsapi.org/v2/"
 
 router = APIRouter()
+
+
+@router.get("/sources/")
+def get_news_sources(
+    country: str = None,
+    page: int = 1,
+    perPage: int = 10,
+):
+    url = f"{URL}/top-headlines/sources"
+    params = {
+        "apiKey": NEWS_API_KEY,
+        "language": "en",
+    }
+    if country:
+        params["country"] = country
+
+    response = requests.get(url, params=params)
+
+    if response.status_code != 200:
+        raise NotFoundException(f"Error fetching news: {response.json()}")
+
+    return Paginate[Source](
+        results=response.json()["sources"],
+        total=len(response.json()["sources"]),
+        page=page,
+        perPage=perPage,
+    )
 
 
 @router.post("/news/", response_model=Paginate[Article])
