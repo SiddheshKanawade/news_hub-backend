@@ -154,6 +154,7 @@ def get_live_news(
     params = {
         "access_key": MEDIASTACK_API_KEY,
         "languages": language,
+        "limit": 100,
     }
 
     if startDate:
