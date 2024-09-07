@@ -1,15 +1,15 @@
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel, HttpUrl
 
 
-class Source(BaseModel):
+class NewsSource(BaseModel):
     id: Optional[str]
     name: str
 
 
 class Article(BaseModel):
-    source: Source
+    source: Union[NewsSource, str]
     author: Optional[str]
     title: str
     description: Optional[str]
@@ -17,6 +17,9 @@ class Article(BaseModel):
     urlToImage: Optional[HttpUrl]
     publishedAt: str
     content: Optional[str]
+    category: Optional[str]
+    language: Optional[str]
+    country: Optional[str]
 
 
 class Source(BaseModel):
