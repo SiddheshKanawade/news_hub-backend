@@ -10,7 +10,7 @@ from aggregator.constants import LIVE_LANGUAGES
 from aggregator.exceptions import NotFoundException
 from aggregator.model import Article, Source
 from aggregator.paginate import Paginate
-from aggregator.utils import fix_response
+from aggregator.utils import fix_live_response, fix_response
 
 dotenv.load_dotenv()
 
@@ -118,16 +118,18 @@ def get_news(
     if response.json()["totalResults"] == 0:
         raise NotFoundException("No news found")
     elif response.json()["totalResults"] < threshold:
+        data = fix_response(response.json()["articles"])
         return Paginate[Article](
-            results=response.json()["articles"],
-            total=len(response.json()["articles"]),
+            results=data,
+            total=len(data),
             page=page,
             perPage=perPage,
         )
     else:
+        data = fix_response(response.json()["articles"])
         return Paginate[Article](
-            results=response.json()["articles"][:threshold],
-            total=len(response.json()["articles"][:threshold]),
+            results=data[:threshold],
+            total=len(data[:threshold]),
             page=page,
             perPage=perPage,
         )
@@ -186,7 +188,7 @@ def get_live_news(
     if response.json()["pagination"]["total"] == 0:
         raise NotFoundException("No news found")
     elif response.json()["pagination"]["total"] < threshold:
-        data = fix_response(response.json()["data"])
+        data = fix_live_response(response.json()["data"])
         return Paginate[Article](
             results=data,
             total=len(data),
@@ -194,7 +196,7 @@ def get_live_news(
             perPage=perPage,
         )
     else:
-        data = fix_response(response.json()["data"])
+        data = fix_live_response(response.json()["data"])
         return Paginate[Article](
             results=data[:threshold],
             total=len(data[:threshold]),
