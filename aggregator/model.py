@@ -30,3 +30,14 @@ class Source(BaseModel):
     category: Optional[str]
     language: Optional[str]
     country: Optional[str]
+
+
+class NSECompany(BaseModel):
+    symbol: str
+    name: str
+    series: str
+    dateOfListing: str
+    paidUpValue: int
+    marketLot: int
+    isinNumber: str
+    faceValue: int

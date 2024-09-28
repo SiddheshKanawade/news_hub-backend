@@ -8,9 +8,9 @@ from fastapi import APIRouter
 
 from aggregator.constants import LIVE_LANGUAGES
 from aggregator.exceptions import NotFoundException
-from aggregator.model import Article, Source
+from aggregator.model import Article, NSECompany, Source
 from aggregator.paginate import Paginate
-from aggregator.utils import fix_live_response, fix_response
+from aggregator.utils import fix_live_response, fix_response, get_nse_companies
 
 dotenv.load_dotenv()
 
@@ -204,3 +204,20 @@ def get_live_news(
             page=page,
             perPage=perPage,
         )
+
+
+@router.get("/nse-companies", response_model=Paginate[NSECompany])
+def get_nse_news(
+    page: int = 1,
+    perPage: int = 10,
+):
+    # try:
+    data = get_nse_companies()
+    # except Exception as e:
+    #     raise NotFoundException(f"Error fetching NSE companies: {e}")
+    return Paginate[NSECompany](
+        results=data,
+        total=len(data),
+        page=page,
+        perPage=perPage,
+    )

@@ -13,3 +13,7 @@ LIVE_LANGUAGES = {
     "se": "Swedish",
     "zh": "Chinese",
 }
+
+NSE_COMPANIES_URL = (
+    "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+)
