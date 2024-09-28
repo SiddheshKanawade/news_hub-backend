@@ -16,6 +16,7 @@ setup(
         "autoflake==1.4",
         "isort==5.9.3",
         "tqdm",
+        "pandas",
     ],
     setup_requires=[
         "pytest-runner",
