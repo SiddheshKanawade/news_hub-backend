@@ -17,3 +17,5 @@ LIVE_LANGUAGES = {
 NSE_COMPANIES_URL = (
     "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
 )
+
+NSE_COMPANIES_CSV = "./static/nse.csv"

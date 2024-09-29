@@ -211,10 +211,11 @@ def get_nse_news(
     page: int = 1,
     perPage: int = 10,
 ):
-    # try:
-    data = get_nse_companies()
-    # except Exception as e:
-    #     raise NotFoundException(f"Error fetching NSE companies: {e}")
+    ## IMPLEMENT WEB SOCKETS FOR CONTINUOUS UPDATES
+    try:
+        data = get_nse_companies()
+    except Exception as e:
+        raise NotFoundException(f"Error fetching NSE companies: {e}")
     return Paginate[NSECompany](
         results=data,
         total=len(data),

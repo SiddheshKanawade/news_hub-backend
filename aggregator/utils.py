@@ -1,9 +1,6 @@
-import io
-
 import pandas as pd
-import requests
 
-from aggregator.constants import NSE_COMPANIES_URL
+from aggregator.constants import NSE_COMPANIES_CSV
 
 
 def fix_live_response(data):
@@ -47,16 +44,7 @@ def fix_response(data):
 
 
 def get_nse_companies():
-    # create Session from 'real' browser
-    headers = {"User-Agent": "Mozilla/5.0"}
-
-    s = requests.Session()
-    s.headers.update(headers)
-
-    r = s.get(NSE_COMPANIES_URL)
-    s.close()
-
-    df_nse = pd.read_csv(io.BytesIO(r.content))
+    df_nse = pd.read_csv(NSE_COMPANIES_CSV)
 
     # Create NSECompany instances for each row
     companies = []
