@@ -10,7 +10,15 @@ from aggregator.constants import LIVE_LANGUAGES
 from aggregator.exceptions import NotFoundException
 from aggregator.model import Article, NSECompany, Source
 from aggregator.paginate import Paginate
-from aggregator.utils import fix_live_response, fix_response, get_nse_companies
+from aggregator.utils import (
+    fix_live_response,
+    fix_response,
+    get_acronym,
+    get_nse_companies,
+    get_nse_ticker,
+    remove_duplicates,
+    remove_limited_from_name,
+)
 
 dotenv.load_dotenv()
 
@@ -169,9 +177,15 @@ def get_live_news(
 
     params["date"] = f"{start_date},{end_date}"
 
-    if keyWords:
-        query = " +".join(keyWords)
-        params["keywords"] = query
+    # Get other company acronyms
+    modified_keywords = []
+    for keyword in keyWords:
+        acronym = get_acronym(keyword)
+        company_name = remove_limited_from_name(keyword)
+        ticker = get_nse_ticker(keyword)
+        modified_keywords.append(acronym)
+        modified_keywords.append(company_name)
+        modified_keywords.append(ticker)
 
     if sources:
         params["sources"] = ",".join(sources)
@@ -181,29 +195,46 @@ def get_live_news(
 
     url = f"{MEDIASTACK_URL}/{endPoint}"
 
-    response = requests.get(url, params=params)
+    if keyWords:
+        accumulated_data = []
+        for keyword in modified_keywords:
+            params["keywords"] = keyword
+            response = requests.get(url, params=params)
+            if response.status_code != 200:
+                print(f"Error fetching news: {response.json()} for {keyword}")
+                continue
+            if response.json()["pagination"]["total"] == 0:
+                print(f"No news found for {keyword}")
+                continue
+            accumulated_data += response.json()["data"]
 
-    if response.status_code != 200:
-        raise NotFoundException(f"Error fetching news: {response.json()}")
+        if len(accumulated_data) == 0:
+            raise NotFoundException("No news found")
 
-    if response.json()["pagination"]["total"] == 0:
-        raise NotFoundException("No news found")
-    elif response.json()["pagination"]["total"] < threshold:
-        data = fix_live_response(response.json()["data"])
+        unique_data = remove_duplicates(accumulated_data)
+        data = fix_live_response(unique_data)
+
         return Paginate[Article](
             results=data,
             total=len(data),
             page=page,
             perPage=perPage,
         )
+
     else:
-        data = fix_live_response(response.json()["data"])
-        return Paginate[Article](
-            results=data[:threshold],
-            total=len(data[:threshold]),
-            page=page,
-            perPage=perPage,
-        )
+        response = requests.get(url, params=params)
+        if response.status_code != 200:
+            raise NotFoundException(f"Error fetching news: {response.json()}")
+        if response.json()["pagination"]["total"] == 0:
+            raise NotFoundException("No news found")
+        else:
+            data = fix_live_response(response.json()["data"])
+            return Paginate[Article](
+                results=data,
+                total=len(data),
+                page=page,
+                perPage=perPage,
+            )
 
 
 @router.get("/nse-companies", response_model=Paginate[NSECompany])

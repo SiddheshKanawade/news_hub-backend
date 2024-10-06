@@ -62,3 +62,27 @@ def get_nse_companies():
         companies.append(company)
 
     return companies
+
+
+def get_acronym(name):
+    return "".join([word[0] for word in name.split(" ")])
+
+
+def remove_limited_from_name(name):
+    if "Limited" in name or "Ltd" in name:
+        return name.replace("Limited", "").replace("Ltd", "").strip()
+
+
+def get_nse_ticker(name):
+    # Get ticker
+    df_nse = pd.read_csv(NSE_COMPANIES_CSV)
+    company_row = df_nse[df_nse["NAME OF COMPANY"] == name]
+    return company_row["SYMBOL"].values[0] if not company_row.empty else None
+
+
+def remove_duplicates(data):
+    unique_data = []
+    for article in data:
+        if article not in unique_data:
+            unique_data.append(article)
+    return unique_data
