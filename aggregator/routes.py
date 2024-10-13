@@ -148,6 +148,73 @@ def get_live_news(
     startDate: datetime = None,
     endDate: datetime = None,
     keyWords: list[str] = None,
+    sources: list[str] = None,
+    endPoint: str = "news",
+    language: str = "en",
+    categories: list[str] = None,
+    retries: int = 3,
+    page: int = 1,
+    perPage: int = 10,
+) -> Any:
+    if language not in LIVE_LANGUAGES.keys():
+        raise NotFoundException(f"Language {language} not supported")
+
+    params = {
+        "access_key": MEDIASTACK_API_KEY,
+        "languages": language,
+        "limit": 100,
+    }
+
+    if startDate:
+        start_date = startDate.strftime("%Y-%m-%d")
+    else:
+        start_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+
+    if endDate:
+        end_date = endDate.strftime("%Y-%m-%d")
+    else:
+        end_date = datetime.now().strftime("%Y-%m-%d")
+
+    params["date"] = f"{start_date},{end_date}"
+
+    if keyWords:
+        query = " +".join(keyWords)
+        params["keywords"] = query
+
+    if categories:
+        params["categories"] = ",".join(categories)
+
+    if sources:
+        params["sources"] = ",".join(sources)
+
+    url = f"{MEDIASTACK_URL}/{endPoint}"
+
+    attempts = 0
+    while attempts < retries:
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            break
+        attempts += 1
+
+    if response.status_code != 200:
+        raise NotFoundException(f"Error fetching news: {response.json()}")
+    if response.json()["pagination"]["total"] == 0:
+        raise NotFoundException("No news found")
+    else:
+        data = fix_live_response(response.json()["data"])
+        return Paginate[Article](
+            results=data,
+            total=len(data),
+            page=page,
+            perPage=perPage,
+        )
+
+
+@router.post("/news/ticker", response_model=Paginate[Article])
+def get_ticker_news(
+    startDate: datetime = None,
+    endDate: datetime = None,
+    keyWords: list[str] = None,
     endPoint: str = "news",
     language: str = "en",
     sources: list[str] = None,
@@ -178,14 +245,15 @@ def get_live_news(
     params["date"] = f"{start_date},{end_date}"
 
     # Get other company acronyms
-    modified_keywords = []
-    for keyword in keyWords:
-        acronym = get_acronym(keyword)
-        company_name = remove_limited_from_name(keyword)
-        ticker = get_nse_ticker(keyword)
-        modified_keywords.append(acronym)
-        modified_keywords.append(company_name)
-        modified_keywords.append(ticker)
+    if keyWords:
+        modified_keywords = []
+        for keyword in keyWords:
+            acronym = get_acronym(keyword)
+            company_name = remove_limited_from_name(keyword)
+            ticker = get_nse_ticker(keyword)
+            modified_keywords.append(acronym)
+            modified_keywords.append(company_name)
+            modified_keywords.append(ticker)
 
     if sources:
         params["sources"] = ",".join(sources)
