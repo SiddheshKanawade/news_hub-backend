@@ -8,6 +8,7 @@ from fastapi import APIRouter
 
 from aggregator.constants import LIVE_LANGUAGES
 from aggregator.exceptions import NotFoundException
+from aggregator.logging import logger
 from aggregator.model import Article, NSECompany, Source
 from aggregator.paginate import Paginate
 from aggregator.utils import (
@@ -196,8 +197,13 @@ def get_live_news(
             break
         attempts += 1
 
-    if response.status_code != 200:
+    if response.status_code == 404:
+        logger.info(f"No news found for {keyWords}")
         raise NotFoundException(f"Error fetching news: {response.json()}")
+    elif response.status_code != 200:
+        logger.info(f"Error fetching news: {response.json()}")
+        raise NotFoundException(f"Error fetching news: {response.json()}")
+
     if response.json()["pagination"]["total"] == 0:
         raise NotFoundException("No news found")
     else:
