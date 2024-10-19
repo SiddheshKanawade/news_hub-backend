@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from aggregator.exceptions import CustomException
-from aggregator.routes import router
+from aggregator.controllers.news import router
 
 APP_URL_PREFIX: str = "/weather"
 
