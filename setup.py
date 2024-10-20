@@ -21,6 +21,7 @@ setup(
         "pydantic-settings==2.6.0",
         "pydantic[email]==2.9.2",
         "python-multipart==0.0.12",
+        "argon2-cffi==23.1.0",
         "tqdm",
         "pandas",
     ],
