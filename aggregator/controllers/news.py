@@ -1,4 +1,3 @@
-import os
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -6,12 +5,12 @@ import dotenv
 import requests
 from fastapi import APIRouter
 
+from aggregator.config import config
 from aggregator.constants import LIVE_LANGUAGES
-from aggregator.exceptions import NotFoundException
-from aggregator.logging import logger
-from aggregator.model import Article, NSECompany, Source
+from aggregator.core import NotFoundException, logger
 from aggregator.paginate import Paginate
-from aggregator.utils import (
+from aggregator.schemas.news import Article, NSECompany, Source
+from aggregator.utils.helper import (
     fix_live_response,
     fix_response,
     get_acronym,
@@ -23,13 +22,10 @@ from aggregator.utils import (
 
 dotenv.load_dotenv()
 
-NEWS_API_KEY = os.getenv("NEWS_API_KEY")
-MEDIASTACK_API_KEY = os.getenv("MEDIASTACK_API_KEY")
-
 NEWS_API_URL = "https://newsapi.org/v2/"
 MEDIASTACK_URL = "http://api.mediastack.com/v1"
 
-router = APIRouter()
+router = APIRouter(prefix="/news", tags=["news"])
 
 
 @router.get("/sources/", response_model=Paginate[Source])
@@ -40,7 +36,7 @@ def get_news_sources(
 ):
     url = f"{NEWS_API_URL}/top-headlines/sources"
     params = {
-        "apiKey": NEWS_API_KEY,
+        "apiKey": config.NEWS_API_KEY,
         "language": "en",
     }
     if country:
@@ -92,7 +88,7 @@ def get_news(
         Paginate[NoaaV1]: Returns list of paginated hailstorm details for given location and time frame
     """
     params = {
-        "apiKey": NEWS_API_KEY,
+        "apiKey": config.NEWS_API_KEY,
         "language": language,
         "sortBy": "relevancy",
         "searcgIn": "title",
@@ -161,7 +157,7 @@ def get_live_news(
         raise NotFoundException(f"Language {language} not supported")
 
     params = {
-        "access_key": MEDIASTACK_API_KEY,
+        "access_key": config.MEDIASTACK_API_KEY,
         "languages": language,
         "limit": 100,
     }
@@ -233,7 +229,7 @@ def get_ticker_news(
         raise NotFoundException(f"Language {language} not supported")
 
     params = {
-        "access_key": MEDIASTACK_API_KEY,
+        "access_key": config.MEDIASTACK_API_KEY,
         "languages": language,
         "limit": 100,
     }

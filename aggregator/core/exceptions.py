@@ -61,3 +61,9 @@ class InternalServerException(CustomException):
 
 class InsufficientDataException(Exception):
     """Raised when sufficient data isn't present to estimate news"""
+
+
+class DuplicateValueException(CustomException):
+    code = HTTPStatus.CONFLICT
+    error_code = HTTPStatus.CONFLICT
+    message = HTTPStatus.CONFLICT.description
