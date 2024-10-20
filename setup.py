@@ -19,7 +19,7 @@ setup(
         "passlib==1.7.4",
         "pymongo==4.1.1",
         "pydantic-settings==2.6.0",
-        "pydantic==2.9.2",
+        "pydantic[email]==2.9.2",
         "python-multipart==0.0.12",
         "tqdm",
         "pandas",
