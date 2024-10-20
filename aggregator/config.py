@@ -26,10 +26,15 @@ class LocalConfig(Config):
     pass
 
 
+class ProductionConfig(Config):
+    pass
+
+
 def get_config():
     env = os.getenv("FAST_ENV", "local")
     config_type = {
         "local": LocalConfig(),
+        "production": ProductionConfig(),
     }
     return config_type[env]
 
