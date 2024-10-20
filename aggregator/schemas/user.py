@@ -10,7 +10,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    email: Optional[str] = None
 
 
 class User(BaseModel):
@@ -18,7 +18,6 @@ class User(BaseModel):
     email: EmailStr
     disabled: Optional[bool] = None
     isVerified: Optional[bool] = None
-    hashedPassword: Optional[str] = None
     createdAt: datetime
     updatedAt: datetime
 
@@ -31,3 +30,8 @@ class UserCreate(BaseModel):
 
 class UserInDB(User):
     hashedPassword: str
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str

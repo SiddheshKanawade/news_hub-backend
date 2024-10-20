@@ -33,6 +33,8 @@ class CRUDUser:
 
     def get_by_email(self, email: str) -> User:
         user_data = user_conn.get_user_by_email(email)
+        if not user_data:
+            return None
         return User(**user_data)
 
 

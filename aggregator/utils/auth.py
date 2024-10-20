@@ -9,11 +9,11 @@ from passlib.context import CryptContext
 from aggregator.config import config
 from aggregator.core import NotFoundException, UnauthorizedException
 from aggregator.core.db import user_conn
-from aggregator.schemas import TokenData, UserInDB
+from aggregator.schemas import TokenData, User, UserInDB
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="token"
+    tokenUrl="/user/token"
 )  # listen to /token endpoint to generate token
 
 
@@ -61,24 +61,25 @@ async def get_current_user(
         payload = jwt.decode(
             token, config.SECRET_KEY, algorithms=[config.ALGORITHM]
         )
-        print(payload)
-        username: str = payload.get("sub")
-        if username is None:
-            raise InvalidCredentialsException
+        email: str = payload.get("sub")
+        if email is None:
+            raise UnauthorizedException
 
-        token_data = TokenData(username=username)
+        token_data = TokenData(email=email)
     except JWTError:
         raise UnauthorizedException
 
-    user = get_user(username=token_data.username)
+    user = get_user(email=token_data.email)
     if user is None:
         raise UnauthorizedException
+
+    user = User(**user)
 
     return user
 
 
 async def get_current_active_user(
-    current_user: UserInDB = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     if current_user.disabled:
         raise NotFoundException(message="Inactive user")

@@ -8,7 +8,11 @@ from aggregator.config import config
 from aggregator.core import UnauthorizedException
 from aggregator.crud import user_crud
 from aggregator.schemas import Token, User, UserCreate
-from aggregator.utils.auth import authenticate_user, create_access_token
+from aggregator.utils.auth import (
+    authenticate_user,
+    create_access_token,
+    get_current_active_user,
+)
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -17,6 +21,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
+    print(form_data.__dict__)
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise UnauthorizedException()
@@ -27,7 +32,7 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/register/", response_model=User)
+@router.post("/register", response_model=User)
 async def register_user(user_data: UserCreate):
     user = user_crud.get_by_email(user_data.email)
     if user:
@@ -41,6 +46,10 @@ async def register_user(user_data: UserCreate):
 
 
 # login endpoint
+@router.post("/login", response_model=User)
+async def login_user(user: User = Depends(get_current_active_user)):
+    return user
+
 
 # register user endpoint
 
