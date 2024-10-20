@@ -55,7 +55,7 @@ def get_news_sources(
     )
 
 
-@router.post("/news/", response_model=Paginate[Article])
+@router.post("/", response_model=Paginate[Article])
 def get_news(
     startDate: datetime = None,
     endDate: datetime = None,
@@ -140,7 +140,7 @@ def get_news(
         )
 
 
-@router.post("/news/live", response_model=Paginate[Article])
+@router.post("/live", response_model=Paginate[Article])
 def get_live_news(
     startDate: datetime = None,
     endDate: datetime = None,
@@ -212,7 +212,7 @@ def get_live_news(
         )
 
 
-@router.post("/news/ticker", response_model=Paginate[Article])
+@router.post("/ticker", response_model=Paginate[Article])
 def get_ticker_news(
     startDate: datetime = None,
     endDate: datetime = None,
