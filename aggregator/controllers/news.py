@@ -3,13 +3,15 @@ from typing import Any
 
 import dotenv
 import requests
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from aggregator.config import config
 from aggregator.constants import LIVE_LANGUAGES
 from aggregator.core import NotFoundException, logger
 from aggregator.paginate import Paginate
+from aggregator.schemas import User
 from aggregator.schemas.news import Article, NSECompany, Source
+from aggregator.utils.auth import get_current_active_user
 from aggregator.utils.helper import (
     fix_live_response,
     fix_response,
@@ -323,3 +325,14 @@ def get_nse_news(
         page=page,
         perPage=perPage,
     )
+
+
+@router.post("/feed", response_model=Paginate[Article])
+def get_user_feed_news(
+    current_user: User = Depends(get_current_active_user),
+) -> Any:
+    # Get sources using current user
+    # Provide news in all categories for the particular sources
+    # Provide option on UI to filter based on category -> TODO!
+    current_user.email
+    return current_user

@@ -57,6 +57,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
 ):  # listen to /token endpoint to generate token
+    """Decode the token and verify the user based on the token data."""
     try:
         payload = jwt.decode(
             token, config.SECRET_KEY, algorithms=[config.ALGORITHM]

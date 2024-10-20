@@ -45,14 +45,6 @@ async def register_user(user_data: UserCreate):
     return user
 
 
-# login endpoint
 @router.post("/login", response_model=User)
-async def login_user(user: User = Depends(get_current_active_user)):
+async def read_user_me(user: User = Depends(get_current_active_user)):
     return user
-
-
-# register user endpoint
-
-# insert list of news sources for particular user endpoint
-
-# get list of news sources for particular user endpoint
