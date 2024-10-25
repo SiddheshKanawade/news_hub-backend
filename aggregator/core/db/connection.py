@@ -33,7 +33,12 @@ class UserDBConnection:
     def add_feed_sources(self, email: str, sources: list[str]):
         return self.db.users.update_one(
             {"email": email},
-            {"$push": {"feedSources": {"$each": sources}}},
+            {
+                "$set": {"feedSources": []},  # Clear the array
+                "$push": {
+                    "feedSources": {"$each": sources}
+                },  # Push new sources
+            },
         )
 
 

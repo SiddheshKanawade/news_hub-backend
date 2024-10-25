@@ -1,6 +1,31 @@
+from datetime import datetime, timedelta
+
 import pandas as pd
+import pytz
 
 from aggregator.constants import NSE_COMPANIES_CSV
+
+
+def get_relative_time(published_at):
+    # Assuming publishedAt is an ISO 8601 string (e.g., "2023-10-24T14:00:00Z")
+    article_time = datetime.fromisoformat(published_at.replace("Z", "+00:00"))
+    current_time = datetime.now(tz=pytz.UTC)
+
+    # Calculate the time difference
+    time_difference = current_time - article_time
+
+    # Format the time difference
+    if time_difference < timedelta(minutes=1):
+        return "just now"
+    elif time_difference < timedelta(hours=1):
+        minutes = int(time_difference.total_seconds() // 60)
+        return f"{minutes} mins ago"
+    elif time_difference < timedelta(days=1):
+        hours = int(time_difference.total_seconds() // 3600)
+        return f"{hours} hours ago"
+    else:
+        days = time_difference.days
+        return f"{days} days ago"
 
 
 def fix_live_response(data):
@@ -12,7 +37,7 @@ def fix_live_response(data):
             "description": article["description"],
             "url": article["url"],
             "urlToImage": article["image"],
-            "publishedAt": article["published_at"],
+            "publishedAt": get_relative_time(article["published_at"]),
             "country": article["country"],
             "language": article["language"],
             "content": None,
@@ -32,7 +57,7 @@ def fix_response(data):
             "description": article["description"],
             "url": article["url"],
             "urlToImage": article["urlToImage"],
-            "publishedAt": article["publishedAt"],
+            "publishedAt": get_relative_time(article["publishedAt"]),
             "content": article["content"],
             "category": None,
             "language": None,
