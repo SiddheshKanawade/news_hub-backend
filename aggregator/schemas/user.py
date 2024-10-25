@@ -18,6 +18,7 @@ class User(BaseModel):
     email: EmailStr
     disabled: Optional[bool] = None
     isVerified: Optional[bool] = None
+    feedSources: Optional[list[str]] = None
     createdAt: datetime
     updatedAt: datetime
 

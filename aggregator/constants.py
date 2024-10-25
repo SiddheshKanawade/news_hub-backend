@@ -19,3 +19,6 @@ NSE_COMPANIES_URL = (
 )
 
 NSE_COMPANIES_CSV = "./static/nse.csv"
+
+NEWS_API_URL = "https://newsapi.org/v2/"
+MEDIASTACK_URL = "http://api.mediastack.com/v1"

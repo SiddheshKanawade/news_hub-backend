@@ -1,17 +1,19 @@
+"""TODO
+1. Code duplication in news endpoints
+"""
+
 from datetime import datetime, timedelta
 from typing import Any
 
 import dotenv
 import requests
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 from aggregator.config import config
-from aggregator.constants import LIVE_LANGUAGES
+from aggregator.constants import LIVE_LANGUAGES, MEDIASTACK_URL, NEWS_API_URL
 from aggregator.core import NotFoundException, logger
 from aggregator.paginate import Paginate
-from aggregator.schemas import User
 from aggregator.schemas.news import Article, NSECompany, Source
-from aggregator.utils.auth import get_current_active_user
 from aggregator.utils.helper import (
     fix_live_response,
     fix_response,
@@ -23,9 +25,6 @@ from aggregator.utils.helper import (
 )
 
 dotenv.load_dotenv()
-
-NEWS_API_URL = "https://newsapi.org/v2/"
-MEDIASTACK_URL = "http://api.mediastack.com/v1"
 
 router = APIRouter(prefix="/news", tags=["news"])
 
@@ -239,7 +238,7 @@ def get_ticker_news(
     if startDate:
         start_date = startDate.strftime("%Y-%m-%d")
     else:
-        start_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        start_date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
 
     if endDate:
         end_date = endDate.strftime("%Y-%m-%d")
@@ -325,14 +324,3 @@ def get_nse_news(
         page=page,
         perPage=perPage,
     )
-
-
-@router.post("/feed", response_model=Paginate[Article])
-def get_user_feed_news(
-    current_user: User = Depends(get_current_active_user),
-) -> Any:
-    # Get sources using current user
-    # Provide news in all categories for the particular sources
-    # Provide option on UI to filter based on category -> TODO!
-    current_user.email
-    return current_user

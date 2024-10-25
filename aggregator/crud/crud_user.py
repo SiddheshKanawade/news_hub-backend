@@ -19,8 +19,9 @@ class CRUDUser:
         user_data["isVerified"] = False
         user_data["disabled"] = False
 
-        user_conn.insert_user(user_data)
-        return User(**user_data)
+        user = User(**user_data)
+        user_conn.insert_user(user)
+        return user
 
     def read(self):
         pass
@@ -36,6 +37,9 @@ class CRUDUser:
         if not user_data:
             return None
         return User(**user_data)
+
+    def add_feed_sources(self, email: str, sources: list[str]):
+        return user_conn.add_feed_sources(email, sources)
 
 
 user_crud = CRUDUser()

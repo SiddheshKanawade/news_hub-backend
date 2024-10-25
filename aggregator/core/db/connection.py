@@ -8,7 +8,7 @@ from aggregator.core.logger import logger
 def get_user_db():
     try:
         db_conn = MongoClient(config.MONGO_DB_URL)
-        db = db_conn.weather
+        db = db_conn.prazo
     except Exception as e:
         logger.info(f"Error connecting to Weather DB: {e}.")
         db = None
@@ -25,10 +25,16 @@ class UserDBConnection:
             )
 
     def insert_user(self, user):
-        return self.db.users.insert_one(user)
+        return self.db.users.insert_one(user.dict())
 
     def get_user_by_email(self, email: str):
         return self.db.users.find_one({"email": email})
+
+    def add_feed_sources(self, email: str, sources: list[str]):
+        return self.db.users.update_one(
+            {"email": email},
+            {"$push": {"feedSources": {"$each": sources}}},
+        )
 
 
 user_conn = UserDBConnection()
