@@ -31,15 +31,24 @@ class UserDBConnection:
         return self.db.users.find_one({"email": email})
 
     def add_feed_sources(self, email: str, sources: list[str]):
-        return self.db.users.update_one(
-            {"email": email},
-            {
-                "$set": {"feedSources": []},  # Clear the array
-                "$push": {
-                    "feedSources": {"$each": sources}
+        try:
+            # First, clear the array
+            self.db.users.update_one(
+                {"email": email},
+                {"$set": {"feedSources": []}},  # Clear the array
+            )
+
+            # Then, push new sources into the now-empty array
+            self.db.users.update_one(
+                {"email": email},
+                {
+                    "$push": {"feedSources": {"$each": sources}}
                 },  # Push new sources
-            },
-        )
+            )
+        except Exception as e:
+            logger.error(f"Error adding feed sources: {e}")
+            raise e
+        return
 
 
 user_conn = UserDBConnection()
