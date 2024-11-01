@@ -12,10 +12,11 @@ from fastapi import APIRouter
 from aggregator.config import config
 from aggregator.constants import LIVE_LANGUAGES, MEDIASTACK_URL, NEWS_API_URL
 from aggregator.core import NotFoundException, logger
+from aggregator.core.db import db_conn
 from aggregator.models.news import Article, NSECompany, Source
 from aggregator.paginate import Paginate
-from aggregator.core.db import db_conn
 from aggregator.utils.helper import (
+    fix_feed_articles,
     fix_live_response,
     fix_response,
     get_acronym,
@@ -23,7 +24,6 @@ from aggregator.utils.helper import (
     get_nse_ticker,
     remove_duplicates,
     remove_limited_from_name,
-    fix_feed_articles
 )
 
 dotenv.load_dotenv()
@@ -58,7 +58,7 @@ def get_news_sources(
     )
 
 
-@router.post("/", response_model=Paginate[Article])
+@router.post("/news-api", response_model=Paginate[Article])
 def get_news(
     startDate: datetime = None,
     endDate: datetime = None,
@@ -326,16 +326,29 @@ def get_nse_news(
         page=page,
         perPage=perPage,
     )
-    
-    
-@router.get("/general", response_model=Paginate[Article])
-def get_live_news() -> Any:
-    db_conn.add_general_news()
-    data = db_conn.get_general_news()
-    data = fix_feed_articles(data)
-    return Paginate[Article](
-        results=data,
-        total=len(data),
-        page=1,
-        perPage=10,
-    )
+
+
+@router.post("/", response_model=Paginate[Article])
+def get_live_news(
+    category: str = None,
+    page: int = 1,
+    perPage: int = 10,
+) -> Any:
+    try:
+        logger.info(f"Checking for updates in {category} news")
+        db_conn.add_general_news()
+    except Exception as e:
+        logger.error(f"Error adding general news: {e}")
+
+    try:
+        logger.info(f"Fetching {category} news")
+        data = db_conn.get_general_news()
+        data = fix_feed_articles(data)
+        return Paginate[Article](
+            results=data,
+            total=len(data),
+            page=page,
+            perPage=perPage,
+        )
+    except Exception as e:
+        raise NotFoundException(f"Error fetching {category} news: {e}")

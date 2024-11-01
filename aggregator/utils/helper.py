@@ -2,14 +2,16 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 import pytz
-from pytz import timezone
+
 from aggregator.constants import NSE_COMPANIES_CSV
 
 
 def get_relative_time(published_at):
     # Assuming publishedAt is an ISO 8601 string (e.g., "2023-10-24T14:00:00Z")
     if isinstance(published_at, str):
-        article_time = datetime.fromisoformat(published_at.replace("Z", "+00:00")).replace(tzinfo=pytz.UTC)
+        article_time = datetime.fromisoformat(
+            published_at.replace("Z", "+00:00")
+        ).replace(tzinfo=pytz.UTC)
     else:
         article_time = published_at.replace(tzinfo=pytz.UTC)
     current_time = datetime.now(tz=pytz.UTC)
@@ -70,10 +72,13 @@ def fix_response(data):
     ]
     return data
 
+
 def fix_feed_articles(data):
     data = [
         {
-            "source": article["source"][0]['name'] if article["source"] else None,
+            "source": article["source"][0]["name"]
+            if article["source"]
+            else None,
             "author": None,
             "title": article["title"],
             "description": article["description"],
@@ -87,7 +92,7 @@ def fix_feed_articles(data):
         }
         for article in data
     ]
-    
+
     return data
 
 

@@ -57,7 +57,7 @@ class DBConnection:
 
             if len(articles) == 0:
                 logger.info("No general news found from Feed")
-                
+
             for article in articles:
                 article = article.dict()
                 self.db.general.update_one(
@@ -70,9 +70,11 @@ class DBConnection:
         except Exception as e:
             logger.error(f"Error adding general news: {e}")
             raise e
-        
-    def get_general_news(self):
-        return list(self.db.general.find({}).sort("datePublished", -1))
+
+    def get_general_news(self, sources=None):
+        return list(
+            self.db.general.find({}).limit(100).sort("datePublished", -1)
+        )
 
 
 db_conn = DBConnection()

@@ -157,3 +157,16 @@ def add_user_feed_sources(
         return {"message": "Feed sources added successfully"}
     except Exception as e:
         raise InternalServerException(message=str(e))
+
+
+@router.post("/feed", response_model=Paginate[Article])
+def get_user_feed_news() -> Any:
+    """Get category based category news
+
+    Params:
+        Category: str = general, politics, sports, business, health, science, technology, entertainment
+        Sources: list[str] = List of sources to get news from
+
+    Returns:
+        Any: _description_
+    """
