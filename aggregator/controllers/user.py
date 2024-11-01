@@ -1,12 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any
 
-import requests
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from aggregator.config import config
-from aggregator.constants import LIVE_LANGUAGES, MEDIASTACK_URL
 from aggregator.core import (
     BadRequestException,
     DuplicateValueException,
@@ -16,6 +14,7 @@ from aggregator.core import (
     UnauthorizedException,
     logger,
 )
+from aggregator.core.db import db_conn
 from aggregator.crud import user_crud
 from aggregator.models.news import Article
 from aggregator.paginate import Paginate
@@ -25,7 +24,7 @@ from aggregator.utils.auth import (
     create_access_token,
     get_current_active_user,
 )
-from aggregator.utils.helper import fix_live_response
+from aggregator.utils.helper import fix_feed_articles
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -65,83 +64,6 @@ async def read_user_me(user: User = Depends(get_current_active_user)):
     return user
 
 
-@router.post(
-    "/feed", response_model=Paginate[Article], status_code=status.HTTP_200_OK
-)
-def get_user_feed_news(
-    startDate: datetime = None,
-    endDate: datetime = None,
-    keyWords: list[str] = None,
-    endPoint: str = "news",
-    language: str = "en",
-    categories: list[str] = None,
-    retries: int = 3,
-    current_user: User = Depends(get_current_active_user),
-    page: int = 1,
-    perPage: int = 10,
-) -> Any:
-    if not current_user.feedSources:
-        logger.info(f"No feed sources found for {current_user.email}")
-        raise BadRequestException("No feed sources found")
-
-    if language not in LIVE_LANGUAGES.keys():
-        raise NotFoundException(f"Language {language} not supported")
-
-    params = {
-        "access_key": config.MEDIASTACK_API_KEY,
-        "languages": language,
-        "limit": 100,
-    }
-
-    if startDate:
-        start_date = startDate.strftime("%Y-%m-%d")
-    else:
-        start_date = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
-
-    if endDate:
-        end_date = endDate.strftime("%Y-%m-%d")
-    else:
-        end_date = datetime.now().strftime("%Y-%m-%d")
-
-    params["date"] = f"{start_date},{end_date}"
-
-    if keyWords:
-        query = " +".join(keyWords)
-        params["keywords"] = query
-
-    if categories:
-        params["categories"] = ",".join(categories)
-
-    params["sources"] = ",".join(current_user.feedSources)
-
-    url = f"{MEDIASTACK_URL}/{endPoint}"
-
-    attempts = 0
-    while attempts < retries:
-        response = requests.get(url, params=params)
-        if response.status_code == 200:
-            break
-        attempts += 1
-
-    if response.status_code == 404:
-        logger.info(f"No news found for {current_user.feedSources}")
-        raise NotFoundException(f"Error fetching news: {response.json()}")
-    elif response.status_code != 200:
-        logger.info(f"Error fetching news: {response.json()}")
-        raise NotFoundException(f"Error fetching news: {response.json()}")
-
-    if response.json()["pagination"]["total"] == 0:
-        raise NotFoundException("No news found")
-    else:
-        data = fix_live_response(response.json()["data"])
-        return Paginate[Article](
-            results=data,
-            total=len(data),
-            page=page,
-            perPage=perPage,
-        )
-
-
 @router.post("/feed-sources", status_code=status.HTTP_201_CREATED)
 def add_user_feed_sources(
     current_user: User = Depends(get_current_active_user),
@@ -159,8 +81,15 @@ def add_user_feed_sources(
         raise InternalServerException(message=str(e))
 
 
-@router.post("/feed", response_model=Paginate[Article])
-def get_user_feed_news() -> Any:
+@router.post(
+    "/feed", response_model=Paginate[Article], status_code=status.HTTP_200_OK
+)
+def get_user_feed_news(
+    category: str = None,
+    current_user: User = Depends(get_current_active_user),
+    page: int = 1,
+    perPage: int = 10,
+) -> Any:
     """Get category based category news
 
     Params:
@@ -170,3 +99,21 @@ def get_user_feed_news() -> Any:
     Returns:
         Any: _description_
     """
+    if not current_user.feedSources:
+        logger.info(f"No feed sources found for {current_user.email}")
+        raise BadRequestException("No feed sources found")
+
+    try:
+        logger.info(f"Fetching feed news for {current_user.email}")
+        data = db_conn.get_feed_news(
+            current_user.feedSources, category=category
+        )
+        data = fix_feed_articles(data)
+        return Paginate[Article](
+            results=data,
+            total=len(data),
+            page=page,
+            perPage=perPage,
+        )
+    except Exception as e:
+        raise NotFoundException(message=f"Error fetching feed news: {e}")

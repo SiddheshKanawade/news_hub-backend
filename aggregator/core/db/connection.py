@@ -71,9 +71,16 @@ class DBConnection:
             logger.error(f"Error adding general news: {e}")
             raise e
 
-    def get_general_news(self, sources=None):
+    def get_general_news(self, category=None):
         return list(
             self.db.general.find({}).limit(100).sort("datePublished", -1)
+        )
+
+    def get_feed_news(self, sources, category=None):
+        return list(
+            self.db.general.find({"source.name": {"$in": sources}})
+            .limit(100)
+            .sort("datePublished", -1)
         )
 
 

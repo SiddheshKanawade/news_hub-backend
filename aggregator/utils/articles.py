@@ -5,8 +5,6 @@ from aggregator.core import logger
 from aggregator.schemas import Attachment, Author, NewsArticle
 
 
-import requests
-
 def get_general_articles():
     articles = []
     headers = {
@@ -23,7 +21,7 @@ def get_general_articles():
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "none",
         "Upgrade-Insecure-Requests": "1",
-        "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36",
     }
 
     try:
@@ -53,4 +51,3 @@ def get_general_articles():
     except Exception as e:
         logger.error(f"Error fetching general articles: {str(e)}")
         return articles
-
