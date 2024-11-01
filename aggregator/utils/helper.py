@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pandas as pd
+import pytz
 from pytz import timezone
 from aggregator.constants import NSE_COMPANIES_CSV
 
@@ -8,10 +9,10 @@ from aggregator.constants import NSE_COMPANIES_CSV
 def get_relative_time(published_at):
     # Assuming publishedAt is an ISO 8601 string (e.g., "2023-10-24T14:00:00Z")
     if isinstance(published_at, str):
-        article_time = datetime.fromisoformat(published_at.replace("Z", "+00:00")).replace(tzinfo=timezone('Asia/Kolkata'))
+        article_time = datetime.fromisoformat(published_at.replace("Z", "+00:00")).replace(tzinfo=pytz.UTC)
     else:
-        article_time = published_at.replace(tzinfo=timezone('Asia/Kolkata'))
-    current_time = datetime.now(timezone('Asia/Kolkata'))
+        article_time = published_at.replace(tzinfo=pytz.UTC)
+    current_time = datetime.now(tz=pytz.UTC)
 
     # Calculate the time difference
     time_difference = current_time - article_time
