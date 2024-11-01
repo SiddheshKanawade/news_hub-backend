@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from aggregator.config import config
 from aggregator.core import GatewayTimeout
 from aggregator.core.logger import logger
+from aggregator.utils.articles import get_general_articles
 
 
 def get_user_db():
@@ -16,7 +17,7 @@ def get_user_db():
     return db
 
 
-class UserDBConnection:
+class DBConnection:
     def __init__(self):
         self.db = get_user_db()
         if self.db is None:
@@ -50,5 +51,28 @@ class UserDBConnection:
             raise e
         return
 
+    def add_general_news(self):
+        try:
+            articles = get_general_articles()
 
-user_conn = UserDBConnection()
+            if len(articles) == 0:
+                logger.info("No general news found from Feed")
+                
+            for article in articles:
+                article = article.dict()
+                self.db.general.update_one(
+                    {"url": article["url"]},  # Filter for existing URL
+                    {
+                        "$setOnInsert": article
+                    },  # Insert only if `url` is not found
+                    upsert=True,  # Creates a new document if no match is found
+                )
+        except Exception as e:
+            logger.error(f"Error adding general news: {e}")
+            raise e
+        
+    def get_general_news(self):
+        return list(self.db.general.find({}).sort("datePublished", -1))
+
+
+db_conn = DBConnection()

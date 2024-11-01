@@ -17,9 +17,9 @@ from aggregator.core import (
     logger,
 )
 from aggregator.crud import user_crud
+from aggregator.models.news import Article
 from aggregator.paginate import Paginate
 from aggregator.schemas import Token, User, UserCreate
-from aggregator.schemas.news import Article
 from aggregator.utils.auth import (
     authenticate_user,
     create_access_token,

@@ -5,7 +5,7 @@ Refer to generic user schema in callisto which has separate schemas for user cre
 
 from datetime import datetime
 
-from aggregator.core.db import user_conn
+from aggregator.core.db import db_conn
 from aggregator.schemas import User, UserCreate, UserInDB
 from aggregator.utils.auth import get_password_hash
 
@@ -20,7 +20,7 @@ class CRUDUser:
         user_data["disabled"] = False
 
         user = User(**user_data)
-        user_conn.insert_user(UserInDB(**user_data))
+        db_conn.insert_user(UserInDB(**user_data))
         return user
 
     def read(self):
@@ -33,13 +33,13 @@ class CRUDUser:
         pass
 
     def get_by_email(self, email: str) -> User:
-        user_data = user_conn.get_user_by_email(email)
+        user_data = db_conn.get_user_by_email(email)
         if not user_data:
             return None
         return User(**user_data)
 
     def add_feed_sources(self, email: str, sources: list[str]):
-        return user_conn.add_feed_sources(email, sources)
+        return db_conn.add_feed_sources(email, sources)
 
 
 user_crud = CRUDUser()

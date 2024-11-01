@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 
 from aggregator.config import config
 from aggregator.core import NotFoundException, UnauthorizedException
-from aggregator.core.db import user_conn
+from aggregator.core.db import db_conn
 from aggregator.schemas import TokenData, User, UserInDB
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
@@ -26,7 +26,7 @@ def get_password_hash(password):
 
 
 def get_user(email: str):
-    return user_conn.get_user_by_email(email)
+    return db_conn.get_user_by_email(email)
 
 
 def authenticate_user(email: str, password: str):

@@ -1,5 +1,5 @@
-from .connection import user_conn
+from .connection import db_conn
 
 __all__ = [
-    "user_conn",
+    "db_conn",
 ]

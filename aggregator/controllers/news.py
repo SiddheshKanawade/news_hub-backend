@@ -12,8 +12,9 @@ from fastapi import APIRouter
 from aggregator.config import config
 from aggregator.constants import LIVE_LANGUAGES, MEDIASTACK_URL, NEWS_API_URL
 from aggregator.core import NotFoundException, logger
+from aggregator.models.news import Article, NSECompany, Source
 from aggregator.paginate import Paginate
-from aggregator.schemas.news import Article, NSECompany, Source
+from aggregator.core.db import db_conn
 from aggregator.utils.helper import (
     fix_live_response,
     fix_response,
@@ -22,6 +23,7 @@ from aggregator.utils.helper import (
     get_nse_ticker,
     remove_duplicates,
     remove_limited_from_name,
+    fix_feed_articles
 )
 
 dotenv.load_dotenv()
@@ -323,4 +325,17 @@ def get_nse_news(
         total=len(data),
         page=page,
         perPage=perPage,
+    )
+    
+    
+@router.get("/general", response_model=Paginate[Article])
+def get_live_news() -> Any:
+    db_conn.add_general_news()
+    data = db_conn.get_general_news()
+    data = fix_feed_articles(data)
+    return Paginate[Article](
+        results=data,
+        total=len(data),
+        page=1,
+        perPage=10,
     )
