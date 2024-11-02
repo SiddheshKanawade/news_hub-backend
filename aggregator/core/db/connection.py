@@ -113,13 +113,13 @@ class DBConnection:
 
     def get_news(self, category=None):
         return list(
-            self.db[category].find({}).limit(100).sort("datePublished", -1)
+            self.db[category].find({}).limit(75).sort("datePublished", -1)
         )
 
     def get_feed_news(self, sources, category):
         return list(
             self.db[category].find({"source.name": {"$in": sources}})
-            .limit(100)
+            .limit(75)
             .sort("datePublished", -1)
         )
 
