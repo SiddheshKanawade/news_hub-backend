@@ -85,7 +85,7 @@ def add_user_feed_sources(
     "/feed", response_model=Paginate[Article], status_code=status.HTTP_200_OK
 )
 def get_user_feed_news(
-    category: str = None,
+    category: str = "general",
     current_user: User = Depends(get_current_active_user),
     page: int = 1,
     perPage: int = 10,
@@ -104,7 +104,7 @@ def get_user_feed_news(
         raise BadRequestException("No feed sources found")
 
     try:
-        logger.info(f"Fetching feed news for {current_user.email}")
+        logger.info(f"Fetching feed news for {category}")
         data = db_conn.get_feed_news(
             current_user.feedSources, category=category
         )
