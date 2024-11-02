@@ -5,7 +5,7 @@ from aggregator.core import logger
 from aggregator.schemas import Attachment, Author, NewsArticle
 
 
-def get_general_articles():
+def get_articles(category: str):
     articles = []
     headers = {
         "authority": "rss.app",
@@ -23,9 +23,14 @@ def get_general_articles():
         "Upgrade-Insecure-Requests": "1",
         "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36",
     }
+    
+    if category == "general":
+        feed_url = config.GENERAL_FEED_URL
+    elif category == "politics":
+        feed_url = config.POLITICS_FEED_URL
 
     try:
-        response = requests.get(config.GENERAL_FEED_URL, headers=headers)
+        response = requests.get(feed_url, headers=headers)
         response.raise_for_status()  # Check if the request was successful
 
         for article in response.json().get("items", []):

@@ -5,7 +5,7 @@ import pytz
 
 from aggregator.constants import NSE_COMPANIES_CSV
 
-
+# Have all datetimes in UTC while storing in the database
 def get_relative_time(published_at):
     # Assuming publishedAt is an ISO 8601 string (e.g., "2023-10-24T14:00:00Z")
     if isinstance(published_at, str):

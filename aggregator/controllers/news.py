@@ -330,19 +330,19 @@ def get_nse_news(
 
 @router.post("/", response_model=Paginate[Article])
 def get_live_news(
-    category: str = None,
+    category: str = 'general',
     page: int = 1,
     perPage: int = 10,
 ) -> Any:
     try:
-        logger.info(f"Checking for updates in {category} news")
-        db_conn.add_general_news()
+        logger.info(f"Checking for updates news")
+        db_conn.add_news()
     except Exception as e:
         logger.error(f"Error adding general news: {e}")
 
     try:
         logger.info(f"Fetching {category} news")
-        data = db_conn.get_general_news()
+        data = db_conn.get_news(category=category)
         data = fix_feed_articles(data)
         return Paginate[Article](
             results=data,
