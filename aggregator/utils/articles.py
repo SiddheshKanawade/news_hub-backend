@@ -23,11 +23,13 @@ def get_articles(category: str):
         "Upgrade-Insecure-Requests": "1",
         "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36",
     }
-    
+
     if category == "general":
         feed_url = config.GENERAL_FEED_URL
     elif category == "politics":
         feed_url = config.POLITICS_FEED_URL
+    elif category == "business":
+        feed_url = config.BUSINESS_FEED_URL
 
     try:
         response = requests.get(feed_url, headers=headers)

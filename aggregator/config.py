@@ -22,6 +22,7 @@ class Config(BaseSettings):
     )
     GENERAL_FEED_URL: str = os.getenv("GENERAL_FEED_URL")
     POLITICS_FEED_URL: str = os.getenv("POLITICS_FEED_URL")
+    BUSINESS_FEED_URL: str = os.getenv("BUSINESS_FEED_URL")
 
 
 class LocalConfig(Config):

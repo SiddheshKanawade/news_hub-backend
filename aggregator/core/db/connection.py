@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta
+
 import pytz
 from pymongo import MongoClient
-from datetime import datetime, timedelta
 
 from aggregator.config import config
 from aggregator.core import GatewayTimeout
@@ -32,13 +33,17 @@ class DBConnection:
 
     def get_user_by_email(self, email: str):
         return self.db.users.find_one({"email": email})
-    
+
     def _is_news_updated(self):
         metadata = self.db.metadata.find_one()
-        
-        last_updated = metadata.get("lastUpdated").replace(tzinfo=pytz.UTC) if metadata else None
+
+        last_updated = (
+            metadata.get("lastUpdated").replace(tzinfo=pytz.UTC)
+            if metadata
+            else None
+        )
         current_time = datetime.now(tz=pytz.UTC)
-        
+
         if current_time - last_updated > timedelta(minutes=15):
             return True
         return False
@@ -62,31 +67,35 @@ class DBConnection:
             logger.error(f"Error adding feed sources: {e}")
             raise e
         return
-    
+
     def _insert_articles(self, articles, category):
         if len(articles) == 0:
-                logger.info(f"No {category} news found from Feed")
-                
+            logger.info(f"No {category} news found from Feed")
+
         for article in articles:
             article = article.dict()
             self.db[category].update_one(
                 {"url": article["url"]},  # Filter for existing URL
-                {
-                    "$setOnInsert": article
-                },  # Insert only if `url` is not found
+                {"$setOnInsert": article},  # Insert only if `url` is not found
                 upsert=True,  # Creates a new document if no match is found
             )
-            
+
     def _add_general_news(self):
         logger.info("Adding general news")
         general_articles = get_articles("general")
         self._insert_articles(general_articles, "general")
         return
-    
+
     def _add_politics_news(self):
         logger.info("Adding politics news")
         politics_articles = get_articles("politics")
         self._insert_articles(politics_articles, "politics")
+        return
+    
+    def _add_business_news(self):
+        logger.info("Adding business news")
+        articles = get_articles("business")
+        self._insert_articles(articles, "business")
         return
 
     def add_news(self):
@@ -97,16 +106,15 @@ class DBConnection:
 
             self._add_general_news()
             self._add_politics_news()
-            
+            self._add_business_news()
+
             # Update metadata
             self.db.metadata.update_one(
                 {},
-                {
-                    "$set": {"lastUpdated": datetime.now(tz=pytz.UTC)}
-                },
-                upsert=True
+                {"$set": {"lastUpdated": datetime.now(tz=pytz.UTC)}},
+                upsert=True,
             )
-            
+
         except Exception as e:
             logger.error(f"Error adding general news: {e}")
             raise e
@@ -118,7 +126,8 @@ class DBConnection:
 
     def get_feed_news(self, sources, category):
         return list(
-            self.db[category].find({"source.name": {"$in": sources}})
+            self.db[category]
+            .find({"source.name": {"$in": sources}})
             .limit(75)
             .sort("datePublished", -1)
         )

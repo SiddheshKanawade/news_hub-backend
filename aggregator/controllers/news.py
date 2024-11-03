@@ -330,7 +330,7 @@ def get_nse_news(
 
 @router.post("/", response_model=Paginate[Article])
 def get_live_news(
-    category: str = 'general',
+    category: str = "general",
     page: int = 1,
     perPage: int = 10,
 ) -> Any:
