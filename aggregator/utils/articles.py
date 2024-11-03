@@ -30,6 +30,12 @@ def get_articles(category: str):
         feed_url = config.POLITICS_FEED_URL
     elif category == "business":
         feed_url = config.BUSINESS_FEED_URL
+    elif category == "scienceandtechnology":
+        feed_url = config.SCIENCE_TECHNOLOGY_FEED_URL
+    elif category == "sports":
+        feed_url = config.SPORTS_FEED_URL
+    elif category == "entertainment":
+        feed_url = config.ENTERTAINMENT_FEED_URL
 
     try:
         response = requests.get(feed_url, headers=headers)

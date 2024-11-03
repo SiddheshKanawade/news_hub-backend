@@ -44,7 +44,7 @@ class DBConnection:
         )
         current_time = datetime.now(tz=pytz.UTC)
 
-        if current_time - last_updated > timedelta(minutes=15):
+        if current_time - last_updated > timedelta(minutes=30):
             return True
         return False
 
@@ -97,6 +97,24 @@ class DBConnection:
         articles = get_articles("business")
         self._insert_articles(articles, "business")
         return
+    
+    def _add_science_technology_news(self):
+        logger.info("Adding Science and Technology news")
+        articles = get_articles("scienceandtechnology")
+        self._insert_articles(articles, "scienceandtechnology")
+        return
+    
+    def _add_sports_news(self):
+        logger.info("Adding Sports news")
+        articles = get_articles("sports")
+        self._insert_articles(articles, "sports")
+        return
+    
+    def _add_entertainment_news(self):
+        logger.info("Adding Entertainment news")
+        articles = get_articles("entertainment")
+        self._insert_articles(articles, "entertainment")
+        return
 
     def add_news(self):
         try:
@@ -107,6 +125,9 @@ class DBConnection:
             self._add_general_news()
             self._add_politics_news()
             self._add_business_news()
+            self._add_science_technology_news()
+            self._add_sports_news()
+            self._add_entertainment_news()
 
             # Update metadata
             self.db.metadata.update_one(
