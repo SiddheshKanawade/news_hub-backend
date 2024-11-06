@@ -91,25 +91,25 @@ class DBConnection:
         politics_articles = get_articles("politics")
         self._insert_articles(politics_articles, "politics")
         return
-    
+
     def _add_business_news(self):
         logger.info("Adding business news")
         articles = get_articles("business")
         self._insert_articles(articles, "business")
         return
-    
+
     def _add_science_technology_news(self):
         logger.info("Adding Science and Technology news")
         articles = get_articles("scienceandtechnology")
         self._insert_articles(articles, "scienceandtechnology")
         return
-    
+
     def _add_sports_news(self):
         logger.info("Adding Sports news")
         articles = get_articles("sports")
         self._insert_articles(articles, "sports")
         return
-    
+
     def _add_entertainment_news(self):
         logger.info("Adding Entertainment news")
         articles = get_articles("entertainment")

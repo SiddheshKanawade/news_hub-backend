@@ -334,11 +334,6 @@ def get_live_news(
     page: int = 1,
     perPage: int = 10,
 ) -> Any:
-    try:
-        logger.info(f"Checking for updates news")
-        db_conn.add_news()
-    except Exception as e:
-        logger.error(f"Error adding general news: {e}")
 
     try:
         logger.info(f"Fetching {category} news")
