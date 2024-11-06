@@ -44,7 +44,7 @@ class DBConnection:
         )
         current_time = datetime.now(tz=pytz.UTC)
 
-        if current_time - last_updated > timedelta(minutes=30):
+        if current_time - last_updated > timedelta(minutes=25):
             return True
         return False
 
