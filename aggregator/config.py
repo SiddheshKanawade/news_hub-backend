@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
-load_dotenv(dotenv_path="./.env")
+load_dotenv(dotenv_path="/home/siddhesh/Desktop/Siddhesh/Projects/news_aggregator/.env")
 
 LOG_FILE_NAME = "aggregator-api"
 

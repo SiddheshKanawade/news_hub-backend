@@ -113,3 +113,5 @@ notebooks/*.ipynb
 
 # k8s/overlays/staging/
 data/
+
+cronjob/logs.txt

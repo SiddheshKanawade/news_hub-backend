@@ -6,14 +6,12 @@ echo "Starting the script..."
 # Initialize Conda (required to activate Conda environments in scripts)
 source /home/siddhesh/miniconda3/etc/profile.d/conda.sh
 
-conda init bash
-
 # Echo statement to confirm Conda is initialized
 echo "Conda initialized."
 
 # Activate the Conda environment
 conda activate news
-echo "Activated Conda environment: your_env_name"
+echo "Activated Conda environment: news"
 
 # Run the Python script
 echo "Running Python script..."
