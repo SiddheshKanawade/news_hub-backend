@@ -118,9 +118,9 @@ class DBConnection:
 
     def add_news(self):
         try:
-            if not self._is_news_updated():
-                logger.info("News is already updated")
-                return
+            # if not self._is_news_updated():
+            #     logger.info("News is already updated")
+            #     return
 
             self._add_general_news()
             self._add_politics_news()

@@ -1,8 +1,21 @@
+from datetime import datetime
+
+import pytz
 import requests
 
 from aggregator.config import config
 from aggregator.core import logger
 from aggregator.schemas import Attachment, Author, NewsArticle
+
+
+def convert_ist_to_utc(date: str):
+    ist_datetime = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
+    ist_timezone = pytz.timezone("Asia/Kolkata")
+    ist_aware_datetime = ist_timezone.localize(ist_datetime)
+    utc_datetime = ist_aware_datetime.astimezone(pytz.utc)
+    utc_datetime_str = utc_datetime.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+    return utc_datetime_str
 
 
 def get_articles(category: str):
@@ -42,6 +55,11 @@ def get_articles(category: str):
         response.raise_for_status()  # Check if the request was successful
 
         for article in response.json().get("items", []):
+            if "The Times of India" in article["authors"][0]["name"]:
+                article["date_published"] = convert_ist_to_utc(
+                    article["date_published"]
+                )
+
             articles.append(
                 NewsArticle(
                     url=article["url"],
