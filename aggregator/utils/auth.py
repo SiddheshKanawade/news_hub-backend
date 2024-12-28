@@ -3,9 +3,9 @@ from typing import Optional
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
+from itsdangerous import URLSafeTimedSerializer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from itsdangerous import URLSafeTimedSerializer
 
 from aggregator.config import config
 from aggregator.core import NotFoundException, UnauthorizedException, logger
@@ -93,11 +93,13 @@ async def get_current_active_user(
     return current_user
 
 
-def create_url_safe_token(data: dict, expires_delta: Optional[timedelta] = None):    
+def create_url_safe_token(
+    data: dict, expires_delta: Optional[timedelta] = None
+):
     return serializer.dumps(data)
 
 
-def verify_url_safe_token(token: str, max_age: int = 86400):    
+def verify_url_safe_token(token: str, max_age: int = 86400):
     try:
         data = serializer.loads(token, max_age=max_age)
         return data

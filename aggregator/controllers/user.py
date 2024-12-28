@@ -1,4 +1,3 @@
-import asyncio
 from datetime import timedelta
 from typing import Any
 
@@ -24,8 +23,8 @@ from aggregator.schemas import Token, User, UserCreate
 from aggregator.utils.auth import (
     authenticate_user,
     create_access_token,
-    get_current_active_user,
     create_url_safe_token,
+    get_current_active_user,
     verify_url_safe_token,
 )
 from aggregator.utils.helper import fix_feed_articles
@@ -58,31 +57,35 @@ async def register_user(user_data: UserCreate):
         raise DuplicateValueException(
             message=f"User with email {user.email} already exists"
         )
-        
+
     # Add user to DB
     user = user_crud.create(user_data)
-    
+
     # Generate verification token
-    url_token = create_url_safe_token({"email": user.email, "username": user.username})
+    url_token = create_url_safe_token(
+        {"email": user.email, "username": user.username}
+    )
     verification_link = f"{config.PRAZO_DOMAIN}/user/verify/{url_token}"
-    
+
     # Send verification email, might be async.
     html = f"""<p>Hi {user.username}, <br> 
         Please click on <a href="{verification_link}">link</a> to verify your email address.</p><br> {verification_link} """
-        
+
     message = MessageSchema(
         subject="Prazo - Verify your email",
         recipients=[user.email],
         body=html,
-        subtype=MessageType.html
+        subtype=MessageType.html,
     )
-    
+
     try:
         await EmailUtils().send_email(message)
     except Exception as e:
         logger.error(f"Error sending verification email: {str(e)}")
-        raise InternalServerException(message="Error sending verification email")
-    
+        raise InternalServerException(
+            message="Error sending verification email"
+        )
+
     # Why am I returning user? just return success message
     return user
 
@@ -146,22 +149,22 @@ async def get_user_feed_news(
     except Exception as e:
         raise NotFoundException(message=f"Error fetching feed news: {e}")
 
+
 @router.get("/verify/{token}")
-async def verify_user_email(token:str):
-    """Add condition to expire token after 7 days
-    """
+async def verify_user_email(token: str):
+    """Add condition to expire token after 7 days"""
     try:
         data = verify_url_safe_token(token)
     except Exception as e:
         logger.error(f"Error verifying token: {str(e)}")
         raise BadRequestException(message="Invalid token")
-    
+
     email = data.get("email")
     user = user_crud.get_by_email(email)
     if not user:
         raise NotFoundException(message="User not found")
-    
+
     user_crud.update(email, {"isVerified": True})
     logger.info(f"User {email} verified successfully")
-    
+
     return {"message": "User verified successfully"}
