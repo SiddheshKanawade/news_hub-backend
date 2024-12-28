@@ -30,6 +30,9 @@ class DBConnection:
 
     def insert_user(self, user):
         return self.db.users.insert_one(user.dict())
+    
+    def update_user(self, email: str, data: dict):
+        return self.db.users.update_one({"email": email}, {"$set": data})
 
     def get_user_by_email(self, email: str):
         return self.db.users.find_one({"email": email})

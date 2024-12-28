@@ -80,5 +80,5 @@ def get_articles(category: str):
             )
         return articles
     except Exception as e:
-        logger.error(f"Error fetching general articles: {str(e)}")
+        logger.error(f"Error fetching {category} articles: {str(e)}")
         return articles

@@ -14,6 +14,7 @@ class Config(BaseSettings):
     DEBUG: bool = True
     TESTING: bool = os.getenv("TESTING", "False").lower() == "true"
     APP_NAME: str = "Aggregator"
+    PRAZO_DOMAIN: str = os.getenv("PRAZO_DOMAIN")
     NEWS_API_KEY: str = os.getenv("NEWS_API_KEY")
     MEDIASTACK_API_KEY: str = os.getenv("MEDIASTACK_API_KEY")
     MONGO_DB_URL: str = os.getenv("MONGO_DB_URL")
@@ -28,6 +29,16 @@ class Config(BaseSettings):
     SCIENCE_TECHNOLOGY_FEED_URL: str = os.getenv("SCIENCE_TECHNOLOGY_FEED_URL")
     SPORTS_FEED_URL: str = os.getenv("SPORTS_FEED_URL")
     ENTERTAINMENT_FEED_URL: str = os.getenv("ENTERTAINMENT_FEED_URL")
+    MAIL_USERNAME: str = os.getenv("MAIL_USERNAME")
+    MAIL_PASSWORD: str = os.getenv("MAIL_PASSWORD")
+    MAIL_FROM: str = os.getenv("MAIL_FROM")
+    MAIL_PORT: int = os.getenv("MAIL_PORT")
+    MAIL_SERVER: str = os.getenv("MAIL_SERVER")
+    MAIL_FROM_NAME: str = os.getenv("MAIL_FROM_NAME")
+    MAIL_STARTTLS: bool = os.getenv("MAIL_STARTTLS", True)
+    MAIL_SSL_TLS: bool = os.getenv("MAIL_SSL_TLS", False)
+    USE_CREDENTIALS: bool = os.getenv("USE_CREDENTIALS", True)
+    VALIDATE_CERTS: bool = os.getenv("VALIDATE_CERTS", True)
 
 
 class LocalConfig(Config):

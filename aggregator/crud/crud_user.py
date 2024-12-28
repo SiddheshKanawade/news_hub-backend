@@ -26,8 +26,9 @@ class CRUDUser:
     def read(self):
         pass
 
-    def update(self):
-        pass
+    def update(self, user_email, data):
+        db_conn.update_user(user_email, data)
+        
 
     def delete(self):
         pass

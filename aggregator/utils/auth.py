@@ -5,9 +5,10 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from itsdangerous import URLSafeTimedSerializer
 
 from aggregator.config import config
-from aggregator.core import NotFoundException, UnauthorizedException
+from aggregator.core import NotFoundException, UnauthorizedException, logger
 from aggregator.core.db import db_conn
 from aggregator.schemas import TokenData, User, UserInDB
 
@@ -15,6 +16,10 @@ pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/user/token"
 )  # listen to /token endpoint to generate token
+
+serializer = URLSafeTimedSerializer(
+    secret_key=config.SECRET_KEY, salt="email-confirm"
+)
 
 
 def verify_password(plain_password, hashed_password):
@@ -86,3 +91,16 @@ async def get_current_active_user(
         raise NotFoundException(message="Inactive user")
 
     return current_user
+
+
+def create_url_safe_token(data: dict, expires_delta: Optional[timedelta] = None):    
+    return serializer.dumps(data)
+
+
+def verify_url_safe_token(token: str, max_age: int = 86400):    
+    try:
+        data = serializer.loads(token, max_age=max_age)
+        return data
+    except Exception as e:
+        logger.error(f"Error verifying url token: {str(e)}")
+        return None
