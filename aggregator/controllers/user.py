@@ -172,7 +172,9 @@ async def verify_user_email(token: str):
 
 
 @router.post("/send-verification-email")
-async def send_verification_email(current_user: User = Depends(get_current_active_user)):
+async def send_verification_email(
+    current_user: User = Depends(get_current_active_user),
+):
     url_token = create_url_safe_token(
         {"email": current_user.email, "username": current_user.username}
     )
