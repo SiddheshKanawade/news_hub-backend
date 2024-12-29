@@ -65,7 +65,7 @@ async def register_user(user_data: UserCreate):
     url_token = create_url_safe_token(
         {"email": user.email, "username": user.username}
     )
-    verification_link = f"{config.PRAZO_DOMAIN}/user/verify/{url_token}"
+    verification_link = f"{config.PRAZO_DOMAIN}/verify/{url_token}"
 
     # Send verification email, might be async.
     html = f"""<p>Hi {user.username}, <br> 
@@ -90,8 +90,9 @@ async def register_user(user_data: UserCreate):
     return user
 
 
-@router.post("/login", response_model=User)
+@router.post("/me", response_model=User)
 async def read_user_me(user: User = Depends(get_current_active_user)):
+    logger.info(f"User {user.email} fetched successfully")
     return user
 
 
@@ -168,3 +169,33 @@ async def verify_user_email(token: str):
     logger.info(f"User {email} verified successfully")
 
     return {"message": "User verified successfully"}
+
+
+@router.post("/send-verification-email")
+async def send_verification_email(current_user: User = Depends(get_current_active_user)):
+    url_token = create_url_safe_token(
+        {"email": current_user.email, "username": current_user.username}
+    )
+    verification_link = f"{config.PRAZO_DOMAIN}/verify/{url_token}"
+
+    # Send verification email, might be async.
+    html = f"""<p>Hi {current_user.username}, <br> 
+        Please click on <a href="{verification_link}">link</a> to verify your email address.</p><br> {verification_link} """
+
+    message = MessageSchema(
+        subject="Prazo - Verify your email",
+        recipients=[current_user.email],
+        body=html,
+        subtype=MessageType.html,
+    )
+
+    try:
+        logger.info(f"Sending verification email to {current_user.email}")
+        await EmailUtils().send_email(message)
+    except Exception as e:
+        logger.error(f"Error sending verification email: {str(e)}")
+        raise InternalServerException(
+            message="Error sending verification email"
+        )
+
+    return {"message": "Verification email sent successfully"}
